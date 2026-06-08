@@ -1,4 +1,5 @@
 import { Router,Request,Response} from "express"
+import { validateLink } from "../middleware/validateLink"
 
 const router = Router()
 
@@ -23,15 +24,10 @@ router.get('/:code',(req:Request,res:Response)=>{
 })
 
 //POST create
-router.post('/',(req:Request,res:Response)=>{
+router.post('/',validateLink,(req:Request,res:Response)=>{
     const {code, url} = req.body
-    if(!code||!url){
-        res.status(400).json({error:'Bad Request',message:'code and url are required'})
-        return
-    }
     const newLink = {id:String(links.length+1),code,url}
     links.push(newLink)
-
     res.status(201).json({data:newLink,message:'Link created'})
 })
 
