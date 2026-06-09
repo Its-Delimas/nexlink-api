@@ -1,5 +1,6 @@
-import { Router,Request,Response} from "express"
+import { Router,Request,Response, NextFunction} from "express"
 import { validateLink } from "../middleware/validateLink"
+import { AppError } from "../errors/AppError"
 
 const router = Router()
 
@@ -14,12 +15,9 @@ router.get('/',(req:Request,res:Response)=>{
 })
 
 //GET one
-router.get('/:code',(req:Request,res:Response)=>{
+router.get('/:code',(req:Request,res:Response,next:NextFunction)=>{
     const link = links.find(l=>l.code===req.params.code)
-    if(!link){
-        res.status(404).json({error:'Not Found',message:'No link with that code'})
-        return
-    }
+    if(!link) return next(new AppError('No link with that code',404))
     res.status(200).json({data:link})
 })
 
@@ -32,28 +30,19 @@ router.post('/',validateLink,(req:Request,res:Response)=>{
 })
 
 //PATCH update
-router.patch('/:code',(req:Request,res:Response)=>{
+router.patch('/:code',(req:Request,res:Response,next:NextFunction)=>{
     const link = links.find(l=>l.code===req.params.code)
-    if(!link){
-        res.status(404).json({error:'Not found',message:'No link with that code'})
-        return
-    }
+    if(!link) return next(new AppError('No link with that code',404))
     const {url} = req.body
-    if(!url){
-        res.status(400).json({error:'Bad request',message:'url is required'})
-        return
-    }
+    if(!url) return next(new AppError('url is required',400))
     link.url = url
     res.status(200).json({data:link,message:'Link updated'})
 })
 
 //DELETE
-router.delete('/:code',(req:Request,res:Response)=>{
+router.delete('/:code',(req:Request,res:Response,next:NextFunction)=>{
     const index = links.findIndex(l=>l.code===req.params.code)
-    if(index===-1){
-        res.status(404).json({error:'Not found',message:'No link with that code'})
-        return
-    }
+    if(index===-1) return next(new AppError('No link with that code',404))
     links.splice(index,1)
     res.status(204).send()
 })
