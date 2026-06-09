@@ -1,5 +1,6 @@
 import express,{Request,Response,NextFunction} from "express"
 import linksRouter from './routes/links'
+import analyticsRouter from './routes/analytics'
 import { logger } from "./middleware/logger"
 import { errorHandler } from "./middleware/errorHandler"
 
@@ -10,6 +11,7 @@ app.use(express.json())
 app.use(logger)
 
 app.use('/links',linksRouter)
+app.use('/analytics',analyticsRouter)
 
 //must be last
 app.use(errorHandler)
