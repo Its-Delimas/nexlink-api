@@ -1,9 +1,10 @@
 import express,{Request,Response,NextFunction} from "express"
 import linksRouter from './routes/links'
 import analyticsRouter from './routes/analytics'
+import authRouter from './routes/auth'
 import { logger } from "./middleware/logger"
 import { errorHandler } from "./middleware/errorHandler"
-import authRouter from './routes/auth'
+
 
 const app = express()
 const PORT = 3000

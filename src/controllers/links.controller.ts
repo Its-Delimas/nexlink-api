@@ -31,10 +31,10 @@ export const updateLink = (req:Request,res:Response,next:NextFunction)=>{
     const link = links.findIndex(l=>l.code===req.params.code)
     if(!link) return next(new AppError('No link with that code',404))
 
-    const {url} = req.body
+    const url = req.body.url
     if(!url) return next(new AppError('url is required',400))
 
-    link.url = url
+    link.url = `${url}`
     res.status(200).json({data:link, message:'Link updated'})
 
 }
@@ -45,4 +45,16 @@ export const deleteLink = (req:Request,res:Response,next:NextFunction)=>{
 
     links.splice(index,1)
     res.status(204).send()
+}
+
+//core feature
+export const redirectLink = (req:Request,res:Response,next:NextFunction)=>{
+    const link = links.find(l=>l.code===req.params.code)
+    if(!link) return next(new AppError('No link with that code',404))
+        res.redirect(link.url)
+}
+
+export const getMyVisits = (req:Request,res:Response)=>{
+    const visited = req.session.visitedLinks || []
+    res.status(200).json({data:visited,total:visited.length})
 }

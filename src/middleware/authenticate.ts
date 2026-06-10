@@ -7,7 +7,7 @@ const JWT_SECRET = 'nexlink_secret_dev'
 export const authenticate = (req:Request,res:Response,next:NextFunction)=>{
     const authHeader = req.headers.authorization
 
-    if(!authHeader||!authHeader.startsWith('Bearer')){
+    if(!authHeader||!authHeader.startsWith('Bearer ')){
         return next(new AppError('No token provided',401))
 }
     const token = authHeader.split(' ')[1]
