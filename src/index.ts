@@ -3,6 +3,7 @@ import linksRouter from './routes/links'
 import analyticsRouter from './routes/analytics'
 import { logger } from "./middleware/logger"
 import { errorHandler } from "./middleware/errorHandler"
+import authRouter from './routes/auth'
 
 const app = express()
 const PORT = 3000
@@ -10,6 +11,7 @@ const PORT = 3000
 app.use(express.json())
 app.use(logger)
 
+app.use('/auth',authRouter)
 app.use('/links',linksRouter)
 app.use('/analytics',analyticsRouter)
 
