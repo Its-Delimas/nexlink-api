@@ -1,60 +1,64 @@
-import { Request,Response,NextFunction } from "express";
-import { AppError } from "../errors/AppError";
+import { Request, Response, NextFunction } from 'express'
+import * as linksService from '../services/link.service'
 
-let links = [
-    {id:'1',code:'abc123',url:'https://google.com'},
-    {id:'2',code:'xyz789',url:'https://github.com'},
-]
-
-export const getAllLinks = (req:Request,res:Response)=>{
-    res.status(200).json({data:links})
+export const getAllLinks = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const links = linksService.findAllLinks()
+    res.status(200).json({ data: links })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const getLinkByCode = (req:Request,res:Response,next:NextFunction)=>{
-    const link = links.find(l=>l.code===req.params.code)
-    if(!link) return next(new AppError('No link with that code',404))
-        res.status(200).json({data:link})
+export const getLinkByCode = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const link = linksService.findLinkByCode(req.params.code)
+    res.status(200).json({ data: link })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const createLink = (req:Request,res:Response)=>{
-    const {code,url} = req.body;
-    const newLink = {
-        id: String(links.length+1),
-        code,
-        url
-    }
-    links.push(newLink)
-    res.status(201).json({data:newLink,message:'Link Created'})
+export const createLink = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { code, url } = req.body
+    const link = linksService.createLink(code, url)
+    res.status(201).json({ data: link, message: 'Link created' })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const updateLink = (req:Request,res:Response,next:NextFunction)=>{
-    const link = links.findIndex(l=>l.code===req.params.code)
-    if(!link) return next(new AppError('No link with that code',404))
-
-    const url = req.body.url
-    if(!url) return next(new AppError('url is required',400))
-
-    link.url = `${url}`
-    res.status(200).json({data:link, message:'Link updated'})
-
+export const updateLink = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { url } = req.body
+    if (!url) throw new Error('url is required')
+    const link = linksService.updateLink(req.params.code, url)
+    res.status(200).json({ data: link, message: 'Link updated' })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const deleteLink = (req:Request,res:Response,next:NextFunction)=>{
-    const index = links.findIndex(l=>l.code===req.params.code)
-    if(index===-1)return next(new AppError('No link with that code',404))
-
-    links.splice(index,1)
+export const deleteLink = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    linksService.deleteLink(req.params.code)
     res.status(204).send()
+  } catch (err) {
+    next(err)
+  }
 }
 
-//core feature
-export const redirectLink = (req:Request,res:Response,next:NextFunction)=>{
-    const link = links.find(l=>l.code===req.params.code)
-    if(!link) return next(new AppError('No link with that code',404))
-        res.redirect(link.url)
+export const redirectLink = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const link = linksService.findLinkByCode(req.params.code)
+    res.redirect(link.url)
+  } catch (err) {
+    next(err)
+  }
 }
 
-export const getMyVisits = (req:Request,res:Response)=>{
-    const visited = req.session.visitedLinks || []
-    res.status(200).json({data:visited,total:visited.length})
+export const getMyVisits = (req: Request, res: Response) => {
+  const visited = req.session.visitedLinks || []
+  res.status(200).json({ data: visited, total: visited.length })
 }
